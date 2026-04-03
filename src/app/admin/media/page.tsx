@@ -12,6 +12,13 @@ interface SiteImageItem {
 }
 
 const LOCATIONS = ["all", "hero", "banner", "lookbook", "pages"];
+const LOCATION_LABELS: Record<string, string> = {
+  all: "ALL",
+  hero: "HERO",
+  banner: "BANNER",
+  lookbook: "LOOKBOOK",
+  pages: "ABOUT BANNER",
+};
 
 export default function AdminMediaPage() {
   const [images, setImages] = useState<SiteImageItem[]>([]);
@@ -123,7 +130,7 @@ export default function AdminMediaPage() {
               }`}
               style={{ fontFamily: "var(--font-typewriter)" }}
             >
-              {t.toUpperCase()}
+              {LOCATION_LABELS[t]}
             </button>
           ))}
         </div>
@@ -177,7 +184,7 @@ export default function AdminMediaPage() {
             }`}
             style={{ fontFamily: "var(--font-typewriter)" }}
           >
-            {loc.toUpperCase()}
+            {LOCATION_LABELS[loc]}
           </button>
         ))}
       </div>
@@ -225,7 +232,7 @@ export default function AdminMediaPage() {
               <div className="p-2 bg-[#111]">
                 <p className="text-[10px] tracking-wider text-infld-yellow uppercase"
                    style={{ fontFamily: "var(--font-typewriter)" }}>
-                  {img.location}
+                  {LOCATION_LABELS[img.location] || img.location.toUpperCase()}
                 </p>
                 <p className="text-[10px] text-infld-grey-mid truncate">{img.label}</p>
               </div>

@@ -1,7 +1,7 @@
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { StarFilled, StarOutline, Lightning, SafetyPin } from "@/components/doodles";
-import { getPageContent } from "@/lib/data";
+import { getPageContent, getSiteImages } from "@/lib/data";
 
 export const metadata = {
   title: "About — INFLD",
@@ -12,7 +12,11 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
-  const content = await getPageContent("about");
+  const [content, aboutImages] = await Promise.all([
+    getPageContent("about"),
+    getSiteImages("pages"),
+  ]);
+  const aboutBannerUrl = aboutImages[0]?.url || null;
 
   const heroTitle = content.hero_title || "WHO IS INFLD?";
   const heroAnnotation = content.hero_annotation || "(and why should you care?)";
@@ -44,11 +48,20 @@ export default async function AboutPage() {
 
       <main className="min-h-screen bg-infld-black">
         {/* Hero */}
-        <section className="relative py-20 px-4 section-textured overflow-hidden">
-          <div className="absolute top-8 right-8 text-infld-yellow opacity-40 rotate-12">
+        <section
+          className="relative py-20 px-4 overflow-hidden"
+          style={aboutBannerUrl ? {
+            backgroundImage: `url(${aboutBannerUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          } : undefined}
+        >
+          {!aboutBannerUrl && <div className="absolute inset-0 section-textured" />}
+          {aboutBannerUrl && <div className="absolute inset-0 bg-infld-black/60" />}
+          <div className="absolute top-8 right-8 text-infld-yellow opacity-40 rotate-12 z-10">
             <SafetyPin size={48} />
           </div>
-          <div className="absolute bottom-12 left-12 text-infld-yellow opacity-30 -rotate-6">
+          <div className="absolute bottom-12 left-12 text-infld-yellow opacity-30 -rotate-6 z-10">
             <StarOutline size={36} />
           </div>
           <div className="max-w-4xl mx-auto text-center relative z-10">

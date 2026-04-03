@@ -10,12 +10,14 @@ import { HeroSlideshow } from "@/components/ui/HeroSlideshow";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [products, content, heroImages] = await Promise.all([
+  const [products, content, heroImages, bannerImages] = await Promise.all([
     getPublishedProducts(),
     getPageContent("home"),
     getSiteImages("hero"),
+    getSiteImages("banner"),
   ]);
   const heroImageUrls = heroImages.map((img) => img.url);
+  const bannerImageUrl = bannerImages[0]?.url || null;
   const heroOverlayOpacity = Math.min(100, Math.max(0, parseInt(content.hero_overlay_opacity || "60", 10)));
   const featuredProducts = products.slice(0, 3);
 
@@ -91,7 +93,15 @@ export default async function Home() {
         </section>
 
         {/* ZINE CALLOUT */}
-        <section className="relative bg-infld-grey-dark py-24 px-4 overflow-hidden">
+        <section
+          className="relative py-24 px-4 overflow-hidden"
+          style={bannerImageUrl ? {
+            backgroundImage: `url(${bannerImageUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          } : { backgroundColor: "var(--color-infld-grey-dark)" }}
+        >
+          {bannerImageUrl && <div className="absolute inset-0 bg-infld-black/50" />}
           <div className="relative z-10 max-w-4xl mx-auto text-center">
             <div className="tape-strip inline-block mb-6">
               <StarFilled size={16} className="text-infld-yellow inline-block mr-2" />
