@@ -10,6 +10,7 @@ const ADMIN_NAV = [
   { href: "/admin/orders", label: "ORDERS", icon: "⧉" },
   { href: "/admin/content", label: "CONTENT", icon: "✎" },
   { href: "/admin/media", label: "MEDIA", icon: "⊞" },
+  { href: "/admin/social", label: "SOCIAL MEDIA", icon: "◈" },
 ];
 
 export default function AdminLayout({

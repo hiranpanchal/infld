@@ -14,7 +14,6 @@ const TABS = [
   { key: "about", label: "ABOUT" },
   { key: "lookbook", label: "LOOKBOOK" },
   { key: "coming-soon", label: "COMING SOON" },
-  { key: "social", label: "SOCIAL MEDIA" },
 ];
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -120,45 +119,7 @@ export default function AdminContentPage() {
         ))}
       </div>
 
-      {/* Social tab: always show fields even if DB records missing */}
-      {activeTab === "social" && tabBlocks.length === 0 && (
-        <div className="space-y-4">
-          {(["instagram", "tiktok", "youtube"] as const).map((platform) => {
-            const key = `social:${platform}`;
-            return (
-              <div key={platform} className="border-2 border-infld-grey-mid p-4 bg-[#0d0d0d]">
-                <label className="block text-[10px] tracking-[0.25em] text-infld-grey-light mb-3 uppercase" style={labelStyle}>
-                  {BLOCK_LABELS[platform]}
-                </label>
-                <input
-                  type="url"
-                  value={edits[key] || ""}
-                  onChange={(e) => setEdits((prev) => ({ ...prev, [key]: e.target.value }))}
-                  className={inputClass}
-                  placeholder={`https://www.${platform}.com/infld`}
-                  style={labelStyle}
-                />
-                <div className="flex items-center gap-3 mt-3">
-                  <button
-                    onClick={() => handleSave("social", platform)}
-                    disabled={saving === key}
-                    className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-1.5 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-50"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    {saving === key ? "SAVING..." : "SAVE"}
-                  </button>
-                  {saved === key && (
-                    <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>✓ SAVED</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* All other tabs */}
-      {(activeTab !== "social" || tabBlocks.length > 0) && tabBlocks.length === 0 && (
+      {tabBlocks.length === 0 && (
         <p className="text-infld-grey-mid text-sm" style={labelStyle}>
           No content blocks for this page yet.
         </p>
