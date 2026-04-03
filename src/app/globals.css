@@ -78,6 +78,17 @@ html[data-theme="light"] .torn-edge-bottom::after {
   background: #F5F0EB;
 }
 
+/* Yellow backgrounds always get true black text regardless of theme */
+html[data-theme="light"] .bg-infld-yellow,
+html[data-theme="light"] .bg-infld-yellow * {
+  --color-infld-black: #0A0A0A;
+  --color-infld-white: #F5F0EB;
+}
+
+html[data-theme="light"] .ticker-tape {
+  color: #0A0A0A;
+}
+
 ::selection {
   background: #FFE600;
   color: #0A0A0A;
