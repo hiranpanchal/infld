@@ -1,65 +1,118 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Nav } from "@/components/layout/Nav";
+import { Footer } from "@/components/layout/Footer";
+import { ProductCard } from "@/components/ui/ProductCard";
+import { EmailForm } from "@/components/ui/EmailForm";
+import { StarFilled, StarOutline, Lightning, SafetyPin } from "@/components/doodles";
+import { getPublishedProducts } from "@/lib/data";
+import { getPageContent } from "@/lib/data";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const [products, content] = await Promise.all([
+    getPublishedProducts(),
+    getPageContent("home"),
+  ]);
+  const featuredProducts = products.slice(0, 3);
+
+  const heroTitle = content.hero_title || "UNINFLUENCED";
+  const heroSubtitle = content.hero_subtitle || "Streetwear for the ones who don't follow.";
+  const manifestoStripe = content.manifesto_stripe || "WE'RE NOT SELLING YOU AN IDENTITY. WE'RE TELLING YOU TO FIND YOUR OWN.";
+  const zineAnnotation = content.zine_annotation || "the anti-ad is the ad";
+  const zineHeading = content.zine_heading || "NOT YOUR BRAND.\nYOUR BRAND.";
+  const emailHeading = content.email_heading || "JOIN THE REBELLION";
+  const emailSubtitle = content.email_subtitle || "New drops. No spam. Just noise.";
+
+  const zineLines = zineHeading.split("\n");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      <Nav />
+      <main>
+        {/* HERO */}
+        <section className="relative min-h-screen flex flex-col items-center justify-center section-textured overflow-hidden torn-edge-bottom">
+          <div className="absolute top-12 left-8 text-infld-yellow opacity-60 rotate-12"><StarFilled size={28} /></div>
+          <div className="absolute top-24 right-12 text-infld-yellow opacity-40 -rotate-6"><Lightning size={32} /></div>
+          <div className="absolute bottom-32 left-16 text-infld-grey-light opacity-30 rotate-45"><SafetyPin size={40} /></div>
+          <div className="absolute top-1/3 right-8 text-infld-grey-mid opacity-20 rotate-12"><StarOutline size={48} /></div>
+          <div className="absolute bottom-48 right-24 text-infld-yellow opacity-50 -rotate-12"><StarFilled size={20} /></div>
+
+          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+            <h1 className="text-display text-infld-white stencil-text mb-4" style={{ fontSize: "clamp(4rem, 18vw, 14rem)" }}>
+              {heroTitle}
+            </h1>
+            <p className="text-infld-grey-light max-w-md mx-auto mb-10" style={{ fontFamily: "var(--font-typewriter)", fontSize: "1.1rem" }}>
+              {heroSubtitle}
+            </p>
+            <Link href="/shop" className="inline-block bg-infld-yellow text-infld-black font-display text-xl tracking-widest px-8 py-4 border-3 border-infld-black shadow-[4px_4px_0_#0A0A0A] hover:shadow-[6px_6px_0_#0A0A0A] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none active:translate-x-1 active:translate-y-1 transition-all duration-75" style={{ fontFamily: "var(--font-display)" }}>
+              SHOP THE DROP
+            </Link>
+          </div>
+        </section>
+
+        {/* MANIFESTO STRIPE */}
+        <section className="bg-infld-yellow py-6 px-4 overflow-hidden">
+          <p className="text-infld-black text-center whitespace-nowrap" style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1rem, 3vw, 2rem)", letterSpacing: "0.05em" }}>
+            {manifestoStripe}
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        </section>
+
+        {/* FEATURED DROP */}
+        <section className="bg-infld-black py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-4 mb-10">
+              <h2 className="text-heading-1 text-infld-white">LATEST DROP</h2>
+              <Lightning size={24} className="text-infld-yellow" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {featuredProducts.map((product) => (
+                <ProductCard
+                  key={product.slug}
+                  slug={product.slug}
+                  name={product.name}
+                  subtitle={product.subtitle}
+                  price={product.price}
+                  badge={product.badge}
+                  imageUrl={product.images[0]?.url}
+                />
+              ))}
+            </div>
+            <div className="mt-8 text-center">
+              <Link href="/shop" className="text-label text-infld-grey-light hover:text-infld-yellow transition-colors inline-flex items-center gap-2">
+                VIEW ALL DROPS &rarr;
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ZINE CALLOUT */}
+        <section className="relative bg-infld-grey-dark py-24 px-4 overflow-hidden">
+          <div className="relative z-10 max-w-4xl mx-auto text-center">
+            <div className="tape-strip inline-block mb-6">
+              <StarFilled size={16} className="text-infld-yellow inline-block mr-2" />
+              <span className="text-annotation text-infld-yellow">{zineAnnotation}</span>
+              <StarFilled size={16} className="text-infld-yellow inline-block ml-2" />
+            </div>
+            <h2 className="text-display text-infld-white mb-4" style={{ fontSize: "clamp(2.5rem, 10vw, 8rem)" }}>
+              {zineLines[0]}
+              {zineLines[1] && <><br /><span className="text-infld-yellow">{zineLines[1]}</span></>}
+            </h2>
+          </div>
+        </section>
+
+        {/* EMAIL CAPTURE */}
+        <section className="bg-infld-black py-20 px-4 border-t border-infld-grey-mid">
+          <div className="max-w-lg mx-auto text-center">
+            <h2 className="text-display text-infld-white mb-3" style={{ fontSize: "clamp(2rem, 8vw, 5rem)" }}>
+              {emailHeading}
+            </h2>
+            <p className="text-label text-infld-grey-light mb-8">{emailSubtitle}</p>
+            <EmailForm />
+          </div>
+        </section>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
