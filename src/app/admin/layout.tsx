@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const ADMIN_NAV = [
   { href: "/admin", label: "DASHBOARD", icon: "◆" },
@@ -60,10 +61,11 @@ export default function AdminLayout({
             );
           })}
         </nav>
-        <div className="p-5 border-t-2 border-infld-grey-mid">
+        <div className="p-5 border-t-2 border-infld-grey-mid space-y-4">
+          <ThemeToggle />
           <Link
             href="/"
-            className="text-[10px] tracking-[0.2em] text-infld-grey-mid hover:text-infld-yellow transition-colors"
+            className="block text-[10px] tracking-[0.2em] text-infld-grey-mid hover:text-infld-yellow transition-colors"
             style={{ fontFamily: "var(--font-typewriter)" }}
           >
             &larr; VIEW STORE
