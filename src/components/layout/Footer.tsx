@@ -1,6 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { StarFilled, Lightning } from "@/components/doodles";
-import { getPageContent } from "@/lib/data";
 
 const FOOTER_LINKS = [
   { href: "/shop", label: "Shop" },
@@ -34,17 +36,29 @@ function YouTubeIcon() {
   );
 }
 
-export async function Footer() {
-  const social = await getPageContent("social");
+export function Footer() {
+  const [social, setSocial] = useState({ instagram: "", tiktok: "", youtube: "" });
 
-  const instagram = social.instagram || "";
-  const tiktok = social.tiktok || "";
-  const youtube = social.youtube || "";
+  useEffect(() => {
+    fetch("/api/admin/content?pageKey=social")
+      .then((r) => r.json())
+      .then((blocks: { blockKey: string; content: string }[]) => {
+        if (!Array.isArray(blocks)) return;
+        const map: Record<string, string> = {};
+        blocks.forEach((b) => { map[b.blockKey] = b.content; });
+        setSocial({
+          instagram: map.instagram || "",
+          tiktok: map.tiktok || "",
+          youtube: map.youtube || "",
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   const socials = [
-    { href: instagram, icon: <InstagramIcon />, label: "Instagram" },
-    { href: tiktok, icon: <TikTokIcon />, label: "TikTok" },
-    { href: youtube, icon: <YouTubeIcon />, label: "YouTube" },
+    { href: social.instagram, icon: <InstagramIcon />, label: "Instagram" },
+    { href: social.tiktok, icon: <TikTokIcon />, label: "TikTok" },
+    { href: social.youtube, icon: <YouTubeIcon />, label: "YouTube" },
   ].filter((s) => s.href);
 
   return (
@@ -63,7 +77,6 @@ export async function Footer() {
           </div>
 
           <div className="flex flex-col items-end gap-4">
-            {/* Social icons */}
             {socials.length > 0 && (
               <div className="flex items-center gap-4">
                 {socials.map((s) => (
