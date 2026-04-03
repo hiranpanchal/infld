@@ -192,7 +192,19 @@ export default function AdminMediaPage() {
           {images.map((img) => (
             <div key={img.id} className="border-2 border-infld-grey-mid overflow-hidden group">
               <div className="aspect-square relative bg-[#111]">
-                <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                <img
+                  src={img.url}
+                  alt={img.alt}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                  }}
+                />
+                <div className="hidden absolute inset-0 flex items-center justify-center flex-col gap-1">
+                  <span className="text-infld-grey-mid text-2xl">✕</span>
+                  <span className="text-infld-grey-mid text-[10px] tracking-wider" style={{ fontFamily: "var(--font-typewriter)" }}>MISSING</span>
+                </div>
                 <div className="absolute inset-0 bg-infld-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <button
                     onClick={() => copyUrl(img.url)}
