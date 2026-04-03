@@ -9,16 +9,50 @@ interface ContentBlock {
   content: string;
 }
 
-const PAGE_LABELS: Record<string, string> = {
-  home: "HOMEPAGE",
-  about: "ABOUT / MANIFESTO",
-  lookbook: "LOOKBOOK",
-  "coming-soon": "COMING SOON",
+const TABS = [
+  { key: "home", label: "HOMEPAGE" },
+  { key: "about", label: "ABOUT" },
+  { key: "lookbook", label: "LOOKBOOK" },
+  { key: "coming-soon", label: "COMING SOON" },
+];
+
+const BLOCK_LABELS: Record<string, string> = {
+  hero_title: "Hero Title",
+  hero_subtitle: "Hero Subtitle",
+  hero_overlay_opacity: "Hero Overlay Opacity (0–100)",
+  manifesto_stripe: "Scrolling Stripe Text",
+  zine_annotation: "Zine Annotation",
+  zine_heading: "Zine Heading",
+  email_heading: "Email Section Heading",
+  email_subtitle: "Email Section Subtitle",
+  hero_annotation: "Hero Annotation",
+  manifesto: "Manifesto Text",
+  philosophy_heading: "Philosophy Heading",
+  philosophy_body: "Philosophy Body",
+  philosophy_signoff: "Philosophy Sign-off",
+  stat1_label: "Stat 1 Label",
+  stat1_value: "Stat 1 Value",
+  stat2_label: "Stat 2 Label",
+  stat2_value: "Stat 2 Value",
+  stat3_label: "Stat 3 Label",
+  stat3_value: "Stat 3 Value",
+  stat4_label: "Stat 4 Label",
+  stat4_value: "Stat 4 Value",
+  heading: "Page Heading",
+  annotation: "Annotation",
+  bottom_line1: "Bottom Line 1",
+  bottom_line2: "Bottom Line 2",
+  subtitle: "Subtitle",
+  bottom_text: "Bottom Text",
 };
+
+const inputClass = "w-full bg-[#0a0a0a] border-2 border-infld-grey-mid text-infld-white px-3 py-2 text-sm focus:border-infld-yellow focus:outline-none transition-colors";
+const labelStyle = { fontFamily: "var(--font-typewriter)" };
 
 export default function AdminContentPage() {
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("home");
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
   const [edits, setEdits] = useState<Record<string, string>>({});
@@ -29,9 +63,7 @@ export default function AdminContentPage() {
       .then((data: ContentBlock[]) => {
         setBlocks(data);
         const initial: Record<string, string> = {};
-        data.forEach((b) => {
-          initial[`${b.pageKey}:${b.blockKey}`] = b.content;
-        });
+        data.forEach((b) => { initial[`${b.pageKey}:${b.blockKey}`] = b.content; });
         setEdits(initial);
         setLoading(false);
       });
@@ -50,13 +82,11 @@ export default function AdminContentPage() {
     setTimeout(() => setSaved(null), 2000);
   };
 
-  const grouped: Record<string, ContentBlock[]> = {};
-  blocks.forEach((b) => {
-    if (!grouped[b.pageKey]) grouped[b.pageKey] = [];
-    grouped[b.pageKey].push(b);
-  });
+  const tabBlocks = blocks.filter((b) => b.pageKey === activeTab);
 
-  if (loading) return <p className="text-infld-grey-mid text-sm" style={{ fontFamily: "var(--font-typewriter)" }}>Loading...</p>;
+  if (loading) return (
+    <p className="text-infld-grey-mid text-sm" style={labelStyle}>Loading...</p>
+  );
 
   return (
     <div className="max-w-3xl">
@@ -64,64 +94,83 @@ export default function AdminContentPage() {
           style={{ fontFamily: "var(--font-display)" }}>
         CONTENT
       </h1>
-      <p className="text-infld-grey-mid text-xs mb-8" style={{ fontFamily: "var(--font-typewriter)" }}>
+      <p className="text-infld-grey-mid text-xs mb-6" style={labelStyle}>
         Edit text content across all pages. Changes take effect on the next page load.
       </p>
 
-      {Object.entries(grouped).map(([pageKey, pageBlocks]) => (
-        <div key={pageKey} className="mb-10">
-          <h2 className="text-lg tracking-wider text-infld-yellow mb-4 pb-2 border-b-2 border-infld-grey-mid"
-              style={{ fontFamily: "var(--font-display)" }}>
-            {PAGE_LABELS[pageKey] || pageKey.toUpperCase()}
-          </h2>
-          <div className="space-y-4">
-            {pageBlocks.map((block) => {
-              const key = `${block.pageKey}:${block.blockKey}`;
-              const isMultiline = (edits[key] || "").includes("\n") || (edits[key] || "").length > 100;
-              return (
-                <div key={block.id} className="border-2 border-infld-grey-mid p-4">
-                  <label className="block text-[10px] tracking-[0.3em] text-infld-grey-light mb-2"
-                         style={{ fontFamily: "var(--font-typewriter)" }}>
-                    {block.blockKey.replace(/_/g, " ").toUpperCase()}
-                  </label>
-                  {isMultiline ? (
-                    <textarea
-                      value={edits[key] || ""}
-                      onChange={(e) => setEdits((prev) => ({ ...prev, [key]: e.target.value }))}
-                      className="w-full bg-[#111] border-2 border-infld-grey-mid text-infld-white px-3 py-2 text-sm h-32 focus:border-infld-yellow focus:outline-none transition-colors"
-                      style={{ fontFamily: "var(--font-typewriter)" }}
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      value={edits[key] || ""}
-                      onChange={(e) => setEdits((prev) => ({ ...prev, [key]: e.target.value }))}
-                      className="w-full bg-[#111] border-2 border-infld-grey-mid text-infld-white px-3 py-2 text-sm focus:border-infld-yellow focus:outline-none transition-colors"
-                      style={{ fontFamily: "var(--font-typewriter)" }}
-                    />
+      {/* Tabs */}
+      <div className="flex gap-0 mb-8 border-b-2 border-infld-grey-mid">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-5 py-2.5 text-[10px] tracking-[0.2em] border-t-2 border-l-2 border-r-2 -mb-[2px] transition-all duration-100 ${
+              activeTab === tab.key
+                ? "bg-infld-yellow text-infld-black border-infld-yellow"
+                : "bg-[#111] text-infld-grey-light border-infld-grey-mid hover:text-infld-white"
+            }`}
+            style={labelStyle}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Blocks */}
+      {tabBlocks.length === 0 ? (
+        <p className="text-infld-grey-mid text-sm" style={labelStyle}>
+          No content blocks for this page yet.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {tabBlocks.map((block) => {
+            const key = `${block.pageKey}:${block.blockKey}`;
+            const value = edits[key] || "";
+            const isMultiline = value.includes("\n") || value.length > 100 || block.blockKey === "manifesto";
+            const label = BLOCK_LABELS[block.blockKey] || block.blockKey.replace(/_/g, " ");
+
+            return (
+              <div key={block.id} className="border-2 border-infld-grey-mid p-4 bg-[#0d0d0d]">
+                <label className="block text-[10px] tracking-[0.25em] text-infld-grey-light mb-3 uppercase"
+                       style={labelStyle}>
+                  {label}
+                </label>
+                {isMultiline ? (
+                  <textarea
+                    value={value}
+                    onChange={(e) => setEdits((prev) => ({ ...prev, [key]: e.target.value }))}
+                    className={`${inputClass} min-h-[100px]`}
+                    style={labelStyle}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => setEdits((prev) => ({ ...prev, [key]: e.target.value }))}
+                    className={inputClass}
+                    style={labelStyle}
+                  />
+                )}
+                <div className="flex items-center gap-3 mt-3">
+                  <button
+                    onClick={() => handleSave(block.pageKey, block.blockKey)}
+                    disabled={saving === key}
+                    className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-1.5 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-50"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {saving === key ? "SAVING..." : "SAVE"}
+                  </button>
+                  {saved === key && (
+                    <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>
+                      ✓ SAVED
+                    </span>
                   )}
-                  <div className="flex items-center gap-3 mt-2">
-                    <button
-                      onClick={() => handleSave(block.pageKey, block.blockKey)}
-                      disabled={saving === key}
-                      className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-1.5 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-50"
-                      style={{ fontFamily: "var(--font-display)" }}
-                    >
-                      {saving === key ? "SAVING..." : "SAVE"}
-                    </button>
-                    {saved === key && (
-                      <span className="text-green-400 text-[10px] tracking-wider"
-                            style={{ fontFamily: "var(--font-typewriter)" }}>
-                        SAVED
-                      </span>
-                    )}
-                  </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      )}
     </div>
   );
 }
