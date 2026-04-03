@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
   const contentBlocks = [
     { pageKey: "home", blockKey: "hero_title", content: "UNINFLUENCED" },
     { pageKey: "home", blockKey: "hero_subtitle", content: "Streetwear for the ones who don't follow." },
+    { pageKey: "home", blockKey: "hero_overlay_opacity", content: "60" },
     { pageKey: "home", blockKey: "manifesto_stripe", content: "WE'RE NOT SELLING YOU AN IDENTITY. WE'RE TELLING YOU TO FIND YOUR OWN." },
     { pageKey: "about", blockKey: "hero_title", content: "WHO IS INFLD?" },
     { pageKey: "about", blockKey: "hero_annotation", content: "(and why should you care?)" },

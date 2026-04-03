@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/ui/ProductCard";
 import { EmailForm } from "@/components/ui/EmailForm";
 import { StarFilled, StarOutline, Lightning, SafetyPin } from "@/components/doodles";
 import { getPublishedProducts, getPageContent, getSiteImages } from "@/lib/data";
+import { HeroSlideshow } from "@/components/ui/HeroSlideshow";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,8 @@ export default async function Home() {
     getPageContent("home"),
     getSiteImages("hero"),
   ]);
-  const heroImageUrl = heroImages[0]?.url || null;
+  const heroImageUrls = heroImages.map((img) => img.url);
+  const heroOverlayOpacity = Math.min(100, Math.max(0, parseInt(content.hero_overlay_opacity || "60", 10)));
   const featuredProducts = products.slice(0, 3);
 
   const heroTitle = content.hero_title || "UNINFLUENCED";
@@ -32,16 +34,8 @@ export default async function Home() {
       <Nav />
       <main>
         {/* HERO */}
-        <section
-          className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden torn-edge-bottom"
-          style={heroImageUrl ? {
-            backgroundImage: `url(${heroImageUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          } : undefined}
-        >
-          {/* dark overlay when image is present, texture when not */}
-          <div className={heroImageUrl ? "absolute inset-0 bg-infld-black/60 z-0" : "absolute inset-0 section-textured z-0"} />
+        <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden torn-edge-bottom">
+          <HeroSlideshow images={heroImageUrls} overlayOpacity={heroOverlayOpacity} />
           <div className="absolute top-12 left-8 text-infld-yellow opacity-60 rotate-12 z-10"><StarFilled size={28} /></div>
           <div className="absolute top-24 right-12 text-infld-yellow opacity-40 -rotate-6 z-10"><Lightning size={32} /></div>
           <div className="absolute bottom-32 left-16 text-infld-grey-light opacity-30 rotate-45 z-10"><SafetyPin size={40} /></div>

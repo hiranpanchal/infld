@@ -153,6 +153,7 @@ async function main() {
   const contentBlocks = [
     { pageKey: "home", blockKey: "hero_title", content: "UNINFLUENCED" },
     { pageKey: "home", blockKey: "hero_subtitle", content: "Streetwear for the ones who don't follow." },
+    { pageKey: "home", blockKey: "hero_overlay_opacity", content: "60" },
     { pageKey: "home", blockKey: "manifesto_stripe", content: "WE'RE NOT SELLING YOU AN IDENTITY. WE'RE TELLING YOU TO FIND YOUR OWN." },
     { pageKey: "home", blockKey: "zine_annotation", content: "the anti-ad is the ad" },
     { pageKey: "home", blockKey: "zine_heading", content: "NOT YOUR BRAND.\nYOUR BRAND." },
