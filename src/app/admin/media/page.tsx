@@ -20,6 +20,8 @@ export default function AdminMediaPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadType, setUploadType] = useState("hero");
   const [copied, setCopied] = useState<string | null>(null);
+  const [externalUrl, setExternalUrl] = useState("");
+  const [addingUrl, setAddingUrl] = useState(false);
 
   const fetchImages = () => {
     const url = filter === "all" ? "/api/admin/media" : `/api/admin/media?location=${filter}`;
@@ -70,6 +72,24 @@ export default function AdminMediaPage() {
     setImages((prev) => prev.filter((i) => i.id !== id));
   };
 
+  const handleAddExternalUrl = async () => {
+    if (!externalUrl.trim()) return;
+    setAddingUrl(true);
+    await fetch("/api/admin/media", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: uploadType,
+        url: externalUrl.trim(),
+        alt: externalUrl.split("/").pop() || "image",
+        label: externalUrl.split("/").pop() || "image",
+      }),
+    });
+    setExternalUrl("");
+    setAddingUrl(false);
+    fetchImages();
+  };
+
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
     setCopied(url);
@@ -89,21 +109,28 @@ export default function AdminMediaPage() {
            style={{ fontFamily: "var(--font-typewriter)" }}>
           UPLOAD
         </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={uploadType}
-            onChange={(e) => setUploadType(e.target.value)}
-            className="bg-[#111] border-2 border-infld-grey-mid text-infld-white px-3 py-1.5 text-xs tracking-wider focus:border-infld-yellow focus:outline-none"
-            style={{ fontFamily: "var(--font-typewriter)" }}
-          >
-            <option value="hero">HERO</option>
-            <option value="banner">BANNER</option>
-            <option value="lookbook">LOOKBOOK</option>
-            <option value="pages">PAGE</option>
-          </select>
-          <label className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-2 border-2 border-infld-black cursor-pointer hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75"
+        {/* Type selector */}
+        <div className="flex gap-2 mb-3 flex-wrap">
+          {["hero", "banner", "lookbook", "pages"].map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setUploadType(t)}
+              className={`px-3 py-1 text-[10px] tracking-[0.15em] border-2 transition-all duration-100 ${
+                uploadType === t
+                  ? "bg-infld-yellow text-infld-black border-infld-yellow"
+                  : "bg-transparent text-infld-grey-light border-infld-grey-mid hover:border-infld-white hover:text-infld-white"
+              }`}
+              style={{ fontFamily: "var(--font-typewriter)" }}
+            >
+              {t.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <label className={`text-[10px] tracking-[0.15em] px-4 py-2 border-2 border-infld-black cursor-pointer transition-all duration-75 ${uploading ? "bg-infld-grey-mid text-infld-black" : "bg-infld-yellow text-infld-black hover:shadow-[2px_2px_0_#FFE600]"}`}
                  style={{ fontFamily: "var(--font-display)" }}>
-            {uploading ? "UPLOADING..." : "CHOOSE FILES"}
+            {uploading ? "UPLOADING..." : "UPLOAD FILE"}
             <input
               type="file"
               accept="image/*"
@@ -113,6 +140,27 @@ export default function AdminMediaPage() {
               disabled={uploading}
             />
           </label>
+        </div>
+        {/* External URL */}
+        <div className="flex gap-2 items-center mt-1">
+          <input
+            type="url"
+            value={externalUrl}
+            onChange={(e) => setExternalUrl(e.target.value)}
+            placeholder="Or paste an external image URL..."
+            className="flex-1 bg-[#111] border-2 border-infld-grey-mid text-infld-white px-3 py-1.5 text-xs focus:border-infld-yellow focus:outline-none transition-colors"
+            style={{ fontFamily: "var(--font-typewriter)" }}
+            onKeyDown={(e) => e.key === "Enter" && handleAddExternalUrl()}
+          />
+          <button
+            type="button"
+            onClick={handleAddExternalUrl}
+            disabled={addingUrl || !externalUrl.trim()}
+            className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-2 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-40"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            {addingUrl ? "ADDING..." : "ADD URL"}
+          </button>
         </div>
       </div>
 
