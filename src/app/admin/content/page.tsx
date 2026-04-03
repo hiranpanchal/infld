@@ -103,12 +103,12 @@ export default function AdminContentPage() {
       </p>
 
       {/* Tabs */}
-      <div className="flex gap-0 mb-8 border-b-2 border-infld-grey-mid">
+      <div className="flex flex-wrap gap-1 mb-8">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-2.5 text-[10px] tracking-[0.2em] border-t-2 border-l-2 border-r-2 -mb-[2px] transition-all duration-100 ${
+            className={`px-4 py-2 text-[10px] tracking-[0.2em] border-2 transition-all duration-100 ${
               activeTab === tab.key
                 ? "bg-infld-yellow text-infld-black border-infld-yellow"
                 : "bg-[#111] text-infld-grey-light border-infld-grey-mid hover:text-infld-white"
@@ -120,12 +120,50 @@ export default function AdminContentPage() {
         ))}
       </div>
 
-      {/* Blocks */}
-      {tabBlocks.length === 0 ? (
+      {/* Social tab: always show fields even if DB records missing */}
+      {activeTab === "social" && tabBlocks.length === 0 && (
+        <div className="space-y-4">
+          {(["instagram", "tiktok", "youtube"] as const).map((platform) => {
+            const key = `social:${platform}`;
+            return (
+              <div key={platform} className="border-2 border-infld-grey-mid p-4 bg-[#0d0d0d]">
+                <label className="block text-[10px] tracking-[0.25em] text-infld-grey-light mb-3 uppercase" style={labelStyle}>
+                  {BLOCK_LABELS[platform]}
+                </label>
+                <input
+                  type="url"
+                  value={edits[key] || ""}
+                  onChange={(e) => setEdits((prev) => ({ ...prev, [key]: e.target.value }))}
+                  className={inputClass}
+                  placeholder={`https://www.${platform}.com/infld`}
+                  style={labelStyle}
+                />
+                <div className="flex items-center gap-3 mt-3">
+                  <button
+                    onClick={() => handleSave("social", platform)}
+                    disabled={saving === key}
+                    className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-1.5 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-50"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {saving === key ? "SAVING..." : "SAVE"}
+                  </button>
+                  {saved === key && (
+                    <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>✓ SAVED</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* All other tabs */}
+      {(activeTab !== "social" || tabBlocks.length > 0) && tabBlocks.length === 0 && (
         <p className="text-infld-grey-mid text-sm" style={labelStyle}>
           No content blocks for this page yet.
         </p>
-      ) : (
+      )}
+      {tabBlocks.length > 0 && (
         <div className="space-y-4">
           {tabBlocks.map((block) => {
             const key = `${block.pageKey}:${block.blockKey}`;
