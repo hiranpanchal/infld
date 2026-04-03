@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     {
       slug: "rebel-edition-hoodie",
       name: "REBEL EDITION HOODIE",
-      subtitle: '"DIY OR DIE"',
+      subtitle: '"REBEL EDITION"',
       price: 7500,
       category: "rebel-edition",
       badge: "LIMITED",

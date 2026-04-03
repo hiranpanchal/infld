@@ -93,7 +93,7 @@ async function main() {
     {
       slug: "rebel-edition-hoodie",
       name: "REBEL EDITION HOODIE",
-      subtitle: '"DIY OR DIE"',
+      subtitle: '"REBEL EDITION"',
       price: 7500,
       category: "rebel-edition",
       badge: "LIMITED",
