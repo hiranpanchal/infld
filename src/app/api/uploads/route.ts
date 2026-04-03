@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 
 const VALID_TYPES = ["products", "hero", "banner", "lookbook", "pages"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -37,18 +42,22 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const ext = path.extname(file.name) || ".jpg";
-  const safeName = file.name
-    .replace(/[^a-zA-Z0-9.-]/g, "-")
-    .replace(ext, "");
-  const filename = `${Date.now()}-${safeName}${ext}`;
+  const result = await new Promise<{ secure_url: string; public_id: string }>(
+    (resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: `infld/${type}`,
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error || !result) reject(error);
+            else resolve(result as { secure_url: string; public_id: string });
+          }
+        )
+        .end(buffer);
+    }
+  );
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", type);
-  await mkdir(uploadDir, { recursive: true });
-
-  const filepath = path.join(uploadDir, filename);
-  await writeFile(filepath, buffer);
-
-  const url = `/uploads/${type}/${filename}`;
-  return NextResponse.json({ url, filename });
+  return NextResponse.json({ url: result.secure_url, filename: result.public_id });
 }
