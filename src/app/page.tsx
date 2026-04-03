@@ -4,16 +4,17 @@ import { Footer } from "@/components/layout/Footer";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { EmailForm } from "@/components/ui/EmailForm";
 import { StarFilled, StarOutline, Lightning, SafetyPin } from "@/components/doodles";
-import { getPublishedProducts } from "@/lib/data";
-import { getPageContent } from "@/lib/data";
+import { getPublishedProducts, getPageContent, getSiteImages } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [products, content] = await Promise.all([
+  const [products, content, heroImages] = await Promise.all([
     getPublishedProducts(),
     getPageContent("home"),
+    getSiteImages("hero"),
   ]);
+  const heroImageUrl = heroImages[0]?.url || null;
   const featuredProducts = products.slice(0, 3);
 
   const heroTitle = content.hero_title || "UNINFLUENCED";
@@ -31,12 +32,21 @@ export default async function Home() {
       <Nav />
       <main>
         {/* HERO */}
-        <section className="relative min-h-screen flex flex-col items-center justify-center section-textured overflow-hidden torn-edge-bottom">
-          <div className="absolute top-12 left-8 text-infld-yellow opacity-60 rotate-12"><StarFilled size={28} /></div>
-          <div className="absolute top-24 right-12 text-infld-yellow opacity-40 -rotate-6"><Lightning size={32} /></div>
-          <div className="absolute bottom-32 left-16 text-infld-grey-light opacity-30 rotate-45"><SafetyPin size={40} /></div>
-          <div className="absolute top-1/3 right-8 text-infld-grey-mid opacity-20 rotate-12"><StarOutline size={48} /></div>
-          <div className="absolute bottom-48 right-24 text-infld-yellow opacity-50 -rotate-12"><StarFilled size={20} /></div>
+        <section
+          className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden torn-edge-bottom"
+          style={heroImageUrl ? {
+            backgroundImage: `url(${heroImageUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          } : undefined}
+        >
+          {/* dark overlay when image is present, texture when not */}
+          <div className={heroImageUrl ? "absolute inset-0 bg-infld-black/60 z-0" : "absolute inset-0 section-textured z-0"} />
+          <div className="absolute top-12 left-8 text-infld-yellow opacity-60 rotate-12 z-10"><StarFilled size={28} /></div>
+          <div className="absolute top-24 right-12 text-infld-yellow opacity-40 -rotate-6 z-10"><Lightning size={32} /></div>
+          <div className="absolute bottom-32 left-16 text-infld-grey-light opacity-30 rotate-45 z-10"><SafetyPin size={40} /></div>
+          <div className="absolute top-1/3 right-8 text-infld-grey-mid opacity-20 rotate-12 z-10"><StarOutline size={48} /></div>
+          <div className="absolute bottom-48 right-24 text-infld-yellow opacity-50 -rotate-12 z-10"><StarFilled size={20} /></div>
 
           <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
             <h1 className="text-display text-infld-white stencil-text mb-4" style={{ fontSize: "clamp(4rem, 18vw, 14rem)" }}>
