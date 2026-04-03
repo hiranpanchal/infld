@@ -106,11 +106,15 @@ export default function EditProductPage() {
           </div>
           <div>
             <label className={labelClass} style={labelStyle}>CATEGORY</label>
-            <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} className={inputClass} style={labelStyle}>
-              <option value="hoodies">Hoodies</option>
-              <option value="tees">Tees</option>
-              <option value="rebel-edition">Rebel Edition</option>
-            </select>
+            <div className="flex gap-2 flex-wrap">
+              {[["hoodies","HOODIES"],["tees","TEES"],["rebel-edition","REBEL"]].map(([val, label]) => (
+                <button key={val} type="button" onClick={() => setForm((f) => ({ ...f, category: val }))}
+                  className={`px-3 py-2 text-[10px] tracking-[0.15em] border-2 transition-all duration-100 ${form.category === val ? "bg-infld-yellow text-infld-black border-infld-yellow" : "bg-transparent text-infld-grey-light border-infld-grey-mid hover:border-infld-white hover:text-infld-white"}`}
+                  style={labelStyle}>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div>
             <label className={labelClass} style={labelStyle}>BADGE</label>
