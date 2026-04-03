@@ -14,6 +14,7 @@ const TABS = [
   { key: "about", label: "ABOUT" },
   { key: "lookbook", label: "LOOKBOOK" },
   { key: "coming-soon", label: "COMING SOON" },
+  { key: "social", label: "SOCIAL MEDIA" },
 ];
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -44,6 +45,9 @@ const BLOCK_LABELS: Record<string, string> = {
   bottom_line2: "Bottom Line 2",
   subtitle: "Subtitle",
   bottom_text: "Bottom Text",
+  instagram: "Instagram URL",
+  tiktok: "TikTok URL",
+  youtube: "YouTube URL",
 };
 
 const inputClass = "w-full bg-[#0a0a0a] border-2 border-infld-grey-mid text-infld-white px-3 py-2 text-sm focus:border-infld-yellow focus:outline-none transition-colors";

@@ -179,6 +179,9 @@ async function main() {
     { pageKey: "lookbook", blockKey: "bottom_line2", content: "THIS IS JUST WHAT WE LOOK LIKE." },
     { pageKey: "coming-soon", blockKey: "subtitle", content: "We're getting ready. You should too." },
     { pageKey: "coming-soon", blockKey: "bottom_text", content: "NOT YOUR BRAND. NOT EVEN CLOSE." },
+    { pageKey: "social", blockKey: "instagram", content: "" },
+    { pageKey: "social", blockKey: "tiktok", content: "" },
+    { pageKey: "social", blockKey: "youtube", content: "" },
   ];
 
   for (const block of contentBlocks) {
