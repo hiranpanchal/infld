@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Anton, Space_Mono, Permanent_Marker, Special_Elite } from "next/font/google";
+import { ThemeProvider } from "@/lib/theme";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -60,26 +61,28 @@ export default function RootLayout({
       className={`${bebasNeue.variable} ${anton.variable} ${spaceMono.variable} ${permanentMarker.variable} ${specialElite.variable}`}
     >
       <body>
-        {/* SVG Roughen Filter */}
-        <svg style={{ display: "none" }} aria-hidden="true">
-          <defs>
-            <filter id="roughen">
-              <feTurbulence
-                baseFrequency="0.02"
-                numOctaves="3"
-                result="noise"
-              />
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="noise"
-                scale="3"
-                xChannelSelector="R"
-                yChannelSelector="G"
-              />
-            </filter>
-          </defs>
-        </svg>
-        {children}
+        <ThemeProvider>
+          {/* SVG Roughen Filter */}
+          <svg style={{ display: "none" }} aria-hidden="true">
+            <defs>
+              <filter id="roughen">
+                <feTurbulence
+                  baseFrequency="0.02"
+                  numOctaves="3"
+                  result="noise"
+                />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="noise"
+                  scale="3"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+            </defs>
+          </svg>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

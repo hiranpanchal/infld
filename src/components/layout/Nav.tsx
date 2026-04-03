@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { TickerTape } from "./TickerTape";
 import { CartDrawer } from "@/components/ui/CartDrawer";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useCartStore } from "@/lib/cart";
 
 const NAV_LINKS = [
@@ -57,6 +58,8 @@ export function Nav() {
                   </span>
                 )}
               </button>
+
+              <ThemeToggle />
             </div>
 
             {/* Mobile: cart + hamburger */}
@@ -117,6 +120,7 @@ export function Nav() {
               {link.label}
             </Link>
           ))}
+          <ThemeToggle />
         </div>
       )}
 
