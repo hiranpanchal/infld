@@ -5,9 +5,18 @@ import Link from "next/link";
 import { StarFilled, Lightning } from "@/components/doodles";
 
 const FOOTER_LINKS = [
-  { href: "/shop", label: "Shop" },
-  { href: "/about", label: "About" },
-  { href: "/lookbook", label: "Lookbook" },
+  { href: "/shop", label: "SHOP" },
+  { href: "/about", label: "ABOUT" },
+  { href: "/lookbook", label: "LOOKBOOK" },
+  { href: "/contact", label: "CONTACT" },
+];
+
+const FOOTER_LEGAL = [
+  { href: "/shipping", label: "SHIPPING" },
+  { href: "/returns", label: "RETURNS" },
+  { href: "/size-guide", label: "SIZE GUIDE" },
+  { href: "/privacy", label: "PRIVACY POLICY" },
+  { href: "/terms", label: "TERMS" },
 ];
 
 function InstagramIcon() {
@@ -111,13 +120,26 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Links */}
-        <div className="flex flex-wrap gap-6 mb-10">
+        {/* Main links */}
+        <div className="flex flex-wrap gap-6 mb-6">
           {FOOTER_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className="text-label text-infld-grey-light hover:text-infld-white transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+        {/* Legal / info links */}
+        <div className="flex flex-wrap gap-4 mb-10">
+          {FOOTER_LEGAL.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[10px] tracking-[0.1em] text-infld-grey-mid hover:text-infld-grey-light transition-colors"
+              style={{ fontFamily: "var(--font-typewriter)" }}
             >
               {link.label}
             </Link>
