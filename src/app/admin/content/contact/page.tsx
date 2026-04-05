@@ -36,7 +36,11 @@ export default function AdminContactPage() {
       .then((r) => r.json())
       .then((data: { blockKey: string; content: string }[]) => {
         const s: Settings = { heading: "", subheading: "", notify_email: "" };
-        data.forEach((b) => { if (b.blockKey in s) (s as Record<string, string>)[b.blockKey] = b.content; });
+        data.forEach((b) => {
+          if (b.blockKey === "heading") s.heading = b.content;
+          else if (b.blockKey === "subheading") s.subheading = b.content;
+          else if (b.blockKey === "notify_email") s.notify_email = b.content;
+        });
         setSettings(s);
         setLoadingSettings(false);
       });
