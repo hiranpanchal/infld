@@ -135,6 +135,30 @@ export function Footer() {
           >
             Made for the ones who think for themselves.
           </p>
+
+          {/* Payment badges */}
+          <div className="flex items-center gap-2 mt-4 flex-wrap">
+            {/* PayPal */}
+            <div className="flex items-center gap-1 border border-infld-grey-mid/50 px-2.5 py-1" style={{ borderRadius: 3 }}>
+              <span style={{ fontFamily: "Arial, sans-serif", fontWeight: 800, fontSize: "11px", color: "#009cde", letterSpacing: "-0.3px" }}>Pay</span>
+              <span style={{ fontFamily: "Arial, sans-serif", fontWeight: 800, fontSize: "11px", color: "#003087", letterSpacing: "-0.3px" }}>Pal</span>
+            </div>
+            {/* Visa */}
+            <div className="flex items-center justify-center border border-infld-grey-mid/50 px-2.5 py-1" style={{ borderRadius: 3, minWidth: 40 }}>
+              <span style={{ fontFamily: "Arial, sans-serif", fontWeight: 900, fontSize: "11px", color: "#A8A8A8", letterSpacing: "1px", fontStyle: "italic" }}>VISA</span>
+            </div>
+            {/* Mastercard */}
+            <div className="flex items-center justify-center border border-infld-grey-mid/50 px-2 py-1" style={{ borderRadius: 3 }}>
+              <span style={{ fontSize: 10, letterSpacing: -1, lineHeight: 1 }}>
+                <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: "50%", background: "#EB001B", opacity: 0.7, verticalAlign: "middle" }} />
+                <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: "50%", background: "#F79E1B", opacity: 0.7, verticalAlign: "middle", marginLeft: -5 }} />
+              </span>
+            </div>
+            {/* Amex */}
+            <div className="flex items-center justify-center border border-infld-grey-mid/50 px-2.5 py-1" style={{ borderRadius: 3, minWidth: 44 }}>
+              <span style={{ fontFamily: "Arial, sans-serif", fontWeight: 700, fontSize: "10px", color: "#A8A8A8", letterSpacing: "0.5px" }}>AMEX</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
