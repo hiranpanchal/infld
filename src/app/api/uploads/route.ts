@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { v2 as cloudinary } from "cloudinary";
 
-const VALID_TYPES = ["products", "hero", "banner", "lookbook", "pages"];
+const VALID_TYPES = [
+  "products", "hero", "banner", "lookbook", "pages",
+  "page-shipping", "page-returns", "page-size-guide",
+  "page-privacy", "page-terms", "page-contact",
+];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
 cloudinary.config({
@@ -42,12 +46,15 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
+  // Group all page-* types under "pages" folder in Cloudinary
+  const cloudinaryFolder = type.startsWith("page-") ? "pages" : type;
+
   const result = await new Promise<{ secure_url: string; public_id: string }>(
     (resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: `infld/${type}`,
+            folder: `infld/${cloudinaryFolder}`,
             resource_type: "image",
           },
           (error, result) => {

@@ -55,7 +55,7 @@ export default function AdminMediaPage() {
     for (const file of Array.from(files)) {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("type", uploadType === "pages" ? "pages" : uploadType);
+      formData.append("type", uploadType);
 
       const uploadRes = await fetch("/api/uploads", { method: "POST", body: formData });
       const uploadData = await uploadRes.json();
