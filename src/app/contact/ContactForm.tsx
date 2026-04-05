@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { StarFilled, Lightning } from "@/components/doodles";
 
-interface Props {
-  heading: string;
-  subheading: string;
-}
-
-export function ContactForm({ heading, subheading }: Props) {
+export function ContactForm() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
@@ -39,27 +34,6 @@ export function ContactForm({ heading, subheading }: Props) {
 
   return (
     <>
-      {/* Hero */}
-      <section className="section-textured px-4 pt-20 pb-16 text-center">
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <StarFilled size={16} className="text-infld-yellow" />
-          <Lightning size={16} className="text-infld-yellow" />
-          <StarFilled size={16} className="text-infld-yellow" />
-        </div>
-        <h1
-          className="text-infld-white mb-4"
-          style={{ fontFamily: "var(--font-display)", fontSize: "clamp(3rem, 12vw, 7rem)", lineHeight: 0.9 }}
-        >
-          {heading}
-        </h1>
-        <p
-          className="text-infld-grey-light max-w-sm mx-auto"
-          style={{ fontFamily: "var(--font-typewriter)", lineHeight: 1.8 }}
-        >
-          {subheading}
-        </p>
-      </section>
-
       {/* Form */}
       <section className="px-4 py-16">
         <div className="max-w-lg mx-auto">
