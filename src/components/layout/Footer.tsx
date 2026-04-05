@@ -125,19 +125,21 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-infld-grey-mid pt-6">
-          <p className="text-xs text-infld-grey-light font-body" style={{ fontFamily: "var(--font-body)" }}>
-            &copy; INFLD 2025. NOT YOUR BRAND.
-          </p>
-          <p
-            className="text-xs text-infld-grey-mid mt-1"
-            style={{ fontFamily: "var(--font-typewriter)" }}
-          >
-            Made for the ones who think for themselves.
-          </p>
+        <div className="border-t border-infld-grey-mid pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-xs text-infld-grey-light font-body" style={{ fontFamily: "var(--font-body)" }}>
+              &copy; INFLD 2025. NOT YOUR BRAND.
+            </p>
+            <p
+              className="text-xs text-infld-grey-mid mt-1"
+              style={{ fontFamily: "var(--font-typewriter)" }}
+            >
+              Made for the ones who think for themselves.
+            </p>
+          </div>
 
           {/* Payment badges */}
-          <div className="flex items-center gap-2 mt-4 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* PayPal */}
             <div className="flex items-center gap-1 border border-infld-grey-mid/50 px-2.5 py-1" style={{ borderRadius: 3 }}>
               <span style={{ fontFamily: "Arial, sans-serif", fontWeight: 800, fontSize: "11px", color: "#009cde", letterSpacing: "-0.3px" }}>Pay</span>
