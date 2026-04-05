@@ -333,6 +333,18 @@ html[data-theme="light"] [class~="bg-[#0a0a0a]"] {
   background-color: #F5F2EF;
 }
 
+/* Sidebar nav: active item uses yellow text in dark mode — use black in light mode */
+html[data-theme="light"] aside nav a {
+  color: #5A5550;
+}
+html[data-theme="light"] aside nav a:hover {
+  color: #0A0A0A;
+}
+html[data-theme="light"] aside nav a[class*="border-l-infld-yellow"] {
+  color: #0A0A0A;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
 html[data-theme="light"] input[class~="bg-[#111]"],
 html[data-theme="light"] input[class~="bg-[#0a0a0a]"],
 html[data-theme="light"] textarea[class~="bg-[#0a0a0a]"],
