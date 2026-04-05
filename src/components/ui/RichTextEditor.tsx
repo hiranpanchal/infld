@@ -39,7 +39,7 @@ export function RichTextEditor({ value, onChange }: Props) {
   // Sync external value changes (e.g. on load)
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value, false);
+      editor.commands.setContent(value);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
