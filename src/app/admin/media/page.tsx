@@ -11,13 +11,19 @@ interface SiteImageItem {
   sortOrder: number;
 }
 
-const LOCATIONS = ["all", "hero", "banner", "lookbook", "pages"];
+const LOCATIONS = ["all", "hero", "banner", "lookbook", "pages", "page-shipping", "page-returns", "page-size-guide", "page-privacy", "page-terms", "page-contact"];
 const LOCATION_LABELS: Record<string, string> = {
   all: "ALL",
   hero: "HERO",
   banner: "BANNER",
   lookbook: "LOOKBOOK",
   pages: "ABOUT BANNER",
+  "page-shipping": "SHIPPING",
+  "page-returns": "RETURNS",
+  "page-size-guide": "SIZE GUIDE",
+  "page-privacy": "PRIVACY",
+  "page-terms": "TERMS",
+  "page-contact": "CONTACT",
 };
 
 export default function AdminMediaPage() {
@@ -118,7 +124,7 @@ export default function AdminMediaPage() {
         </p>
         {/* Type selector */}
         <div className="flex gap-2 mb-3 flex-wrap">
-          {["hero", "banner", "lookbook", "pages"].map((t) => (
+          {["hero", "banner", "lookbook", "pages", "page-shipping", "page-returns", "page-size-guide", "page-privacy", "page-terms", "page-contact"].map((t) => (
             <button
               key={t}
               type="button"
