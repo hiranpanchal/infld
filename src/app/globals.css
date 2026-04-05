@@ -94,6 +94,29 @@ html[data-theme="light"] .ticker-tape {
   color: #0A0A0A;
 }
 
+/* Email form input */
+.email-input {
+  background: transparent;
+  border: 2px solid var(--color-infld-grey-mid);
+  color: var(--color-infld-white);
+  padding: 0.75rem 1rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.email-input::placeholder {
+  color: var(--color-infld-grey-light);
+}
+
+.email-input:focus {
+  border-color: var(--color-infld-yellow);
+}
+
 /* Focus rings */
 *:focus-visible {
   outline: 2px solid #FFE600;
@@ -293,4 +316,27 @@ body::after {
     2px 2px 0 rgba(0, 0, 0, 0.4),
     -1px -1px 0 rgba(0, 0, 0, 0.2);
   letter-spacing: 0.05em;
+}
+
+/* ============================================
+   ADMIN LIGHT MODE FIXES
+   — Override hardcoded dark backgrounds
+   ============================================ */
+
+html[data-theme="light"] [class~="bg-[#111]"],
+html[data-theme="light"] [class~="bg-[#111111]"],
+html[data-theme="light"] [class~="bg-[#0d0d0d]"] {
+  background-color: #EAE6E1;
+}
+
+html[data-theme="light"] [class~="bg-[#0a0a0a]"] {
+  background-color: #F5F2EF;
+}
+
+html[data-theme="light"] input[class~="bg-[#111]"],
+html[data-theme="light"] input[class~="bg-[#0a0a0a]"],
+html[data-theme="light"] textarea[class~="bg-[#0a0a0a]"],
+html[data-theme="light"] select[class~="bg-[#111]"] {
+  background-color: #FAFAF8 !important;
+  color: #0A0A0A !important;
 }
