@@ -1,18 +1,18 @@
 interface Props {
   title?: string;
   bannerUrl?: string | null;
-  height?: string;
 }
 
-export function PageBanner({ title, bannerUrl, height = "py-20" }: Props) {
+export function PageBanner({ title, bannerUrl }: Props) {
   return (
     <section
-      className={`relative ${height} px-4 overflow-hidden`}
-      style={
-        bannerUrl
+      className="relative overflow-hidden flex items-center px-4"
+      style={{
+        height: "600px",
+        ...(bannerUrl
           ? { backgroundImage: `url(${bannerUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
-          : undefined
-      }
+          : undefined),
+      }}
     >
       {!bannerUrl && <div className="absolute inset-0 section-textured" />}
       {bannerUrl && <div className="absolute inset-0 bg-infld-black/60" />}
