@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Anton, Space_Mono, Permanent_Marker, Special_Elite } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme";
+import { PayPalProvider } from "@/components/ui/PayPalProvider";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -62,6 +63,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
+          <PayPalProvider>
           {/* SVG Roughen Filter */}
           <svg style={{ display: "none" }} aria-hidden="true">
             <defs>
@@ -82,6 +84,7 @@ export default function RootLayout({
             </defs>
           </svg>
           {children}
+          </PayPalProvider>
         </ThemeProvider>
       </body>
     </html>

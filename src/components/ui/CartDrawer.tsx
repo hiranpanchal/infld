@@ -2,6 +2,8 @@
 
 import { useCartStore } from "@/lib/cart";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 
 export function CartDrawer({
   isOpen,
@@ -12,27 +14,9 @@ export function CartDrawer({
 }) {
   const { items, removeItem, updateQuantity, totalPence, clearCart } =
     useCartStore();
-  const [loading, setLoading] = useState(false);
-
-  const handleCheckout = async () => {
-    if (items.length === 0) return;
-    setLoading(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch {
-      alert("Checkout failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [{ isPending: paypalLoading }] = usePayPalScriptReducer();
+  const [paypalError, setPaypalError] = useState<string | null>(null);
+  const router = useRouter();
 
   if (!isOpen) return null;
 
@@ -88,18 +72,25 @@ export function CartDrawer({
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <p
-                        className="text-infld-white text-sm font-bold"
-                        style={{ fontFamily: "var(--font-heading)" }}
+                        className="text-infld-white tracking-wide"
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "0.95rem",
+                        }}
                       >
                         {item.productName}
                       </p>
-                      <p className="text-infld-grey-light text-xs">
+                      <p
+                        className="text-infld-grey-light text-xs mt-0.5"
+                        style={{ fontFamily: "var(--font-typewriter)" }}
+                      >
                         Size: {item.size}
                       </p>
                     </div>
                     <button
                       onClick={() => removeItem(item.productId, item.size)}
                       className="text-infld-grey-light hover:text-infld-yellow text-xs"
+                      style={{ fontFamily: "var(--font-typewriter)" }}
                     >
                       REMOVE
                     </button>
@@ -134,7 +125,10 @@ export function CartDrawer({
                         +
                       </button>
                     </div>
-                    <p className="text-infld-white text-sm font-bold">
+                    <p
+                      className="text-infld-white text-sm"
+                      style={{ fontFamily: "var(--font-body)" }}
+                    >
                       &pound;{((item.price * item.quantity) / 100).toFixed(2)}
                     </p>
                   </div>
@@ -146,24 +140,86 @@ export function CartDrawer({
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-infld-grey-mid p-4 space-y-3">
+          <div className="border-t border-infld-grey-mid p-4 space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-label text-infld-grey-light">TOTAL</span>
               <span
-                className="text-infld-white text-xl font-bold"
+                className="text-infld-white text-xl"
                 style={{ fontFamily: "var(--font-body)" }}
               >
                 &pound;{(totalPence() / 100).toFixed(2)}
               </span>
             </div>
-            <button
-              onClick={handleCheckout}
-              disabled={loading}
-              className="w-full bg-infld-yellow text-infld-black font-display text-lg tracking-widest py-3 border-3 border-infld-black shadow-[4px_4px_0_#0A0A0A] hover:shadow-[6px_6px_0_#0A0A0A] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none active:translate-x-1 active:translate-y-1 transition-all duration-75 disabled:opacity-50"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              {loading ? "PROCESSING..." : "CHECKOUT"}
-            </button>
+
+            {paypalError && (
+              <p
+                className="text-red-400 text-xs text-center"
+                style={{ fontFamily: "var(--font-typewriter)" }}
+              >
+                {paypalError}
+              </p>
+            )}
+
+            {paypalLoading ? (
+              <div
+                className="text-infld-grey-light text-xs text-center py-4"
+                style={{ fontFamily: "var(--font-typewriter)" }}
+              >
+                Loading payment options...
+              </div>
+            ) : (
+              <PayPalButtons
+                style={{
+                  layout: "vertical",
+                  shape: "rect",
+                  color: "gold",
+                  label: "pay",
+                  height: 45,
+                }}
+                createOrder={async () => {
+                  setPaypalError(null);
+                  const res = await fetch("/api/checkout/paypal", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "create", items }),
+                  });
+                  const data = await res.json();
+                  if (!data.id) throw new Error("Order creation failed");
+                  return data.id;
+                }}
+                onApprove={async (data) => {
+                  setPaypalError(null);
+                  const res = await fetch("/api/checkout/paypal", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      action: "capture",
+                      orderID: data.orderID,
+                      items,
+                    }),
+                  });
+                  const result = await res.json();
+                  if (result.success) {
+                    clearCart();
+                    onClose();
+                    router.push(
+                      `/checkout/success?order=${result.orderNumber}`
+                    );
+                  } else {
+                    setPaypalError(
+                      "Payment capture failed. Please contact support."
+                    );
+                  }
+                }}
+                onError={() => {
+                  setPaypalError("Payment failed. Please try again.");
+                }}
+                onCancel={() => {
+                  setPaypalError(null);
+                }}
+              />
+            )}
+
             <button
               onClick={clearCart}
               className="w-full text-label text-infld-grey-light hover:text-infld-yellow transition-colors py-2"

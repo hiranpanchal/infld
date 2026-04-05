@@ -12,6 +12,7 @@ import { useCartStore } from "@/lib/cart";
 function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const orderNumber = searchParams.get("order");
   const clearCart = useCartStore((s) => s.clearCart);
 
   useEffect(() => {
@@ -43,9 +44,9 @@ function SuccessContent() {
       >
         A confirmation email is on its way.
       </p>
-      {sessionId && (
-        <p className="text-infld-grey-mid text-xs mb-8 break-all" style={{ fontFamily: "var(--font-body)" }}>
-          Ref: {sessionId}
+      {(orderNumber || sessionId) && (
+        <p className="text-infld-grey-mid text-xs mb-8" style={{ fontFamily: "var(--font-body)" }}>
+          Order ref: {orderNumber ?? sessionId}
         </p>
       )}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
