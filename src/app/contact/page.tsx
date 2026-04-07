@@ -14,6 +14,7 @@ export default async function ContactPage() {
   ]);
 
   const heading = blocks.find((b) => b.blockKey === "heading")?.content ?? "GET IN TOUCH";
+  const headingSize = blocks.find((b) => b.blockKey === "heading_size")?.content ?? "7rem";
   const subheading =
     blocks.find((b) => b.blockKey === "subheading")?.content ?? "Questions? Collabs? Noise? We're here.";
   const bannerUrl = images[0]?.url;
@@ -42,7 +43,7 @@ export default async function ContactPage() {
             </div>
             <h1
               className="text-infld-white stencil-text mb-4"
-              style={{ fontFamily: "var(--font-display)", fontSize: "clamp(3rem, 12vw, 7rem)", lineHeight: 0.9 }}
+              style={{ fontFamily: "var(--font-display)", fontSize: headingSize, lineHeight: 0.9 }}
             >
               {heading}
             </h1>

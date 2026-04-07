@@ -8,20 +8,24 @@ import { getSiteImages } from "@/lib/data";
 export const dynamic = "force-dynamic";
 
 export default async function PrivacyPage() {
-  const [block, images] = await Promise.all([
-    prisma.pageContent.findUnique({ where: { pageKey_blockKey: { pageKey: "privacy", blockKey: "body" } } }),
+  const [blocks, images] = await Promise.all([
+    prisma.pageContent.findMany({ where: { pageKey: "privacy" } }),
     getSiteImages("page-privacy"),
   ]);
+
+  const html = blocks.find((b) => b.blockKey === "body")?.content ?? "";
+  const bannerTitle = blocks.find((b) => b.blockKey === "banner_title")?.content ?? "PRIVACY POLICY";
+  const bannerFontSize = blocks.find((b) => b.blockKey === "banner_title_size")?.content;
 
   return (
     <>
       <Nav />
       <main className="min-h-screen bg-infld-black">
-        <PageBanner title="PRIVACY POLICY" bannerUrl={images[0]?.url} />
+        <PageBanner title={bannerTitle} bannerUrl={images[0]?.url} fontSize={bannerFontSize} />
         <section className="px-4 py-16">
           <div className="max-w-2xl mx-auto">
-            {block?.content ? (
-              <RichTextContent html={block.content} />
+            {html ? (
+              <RichTextContent html={html} />
             ) : (
               <p className="text-infld-grey-mid text-sm" style={{ fontFamily: "var(--font-typewriter)" }}>
                 Privacy policy coming soon.

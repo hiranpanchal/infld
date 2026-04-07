@@ -51,6 +51,23 @@ const BLOCK_LABELS: Record<string, string> = {
   bottom_text: "Bottom Text",
 };
 
+const FONT_SIZES = [
+  { label: "XS", value: "2rem" },
+  { label: "SM", value: "3rem" },
+  { label: "MD", value: "5rem" },
+  { label: "LG", value: "7rem" },
+  { label: "XL", value: "9rem" },
+  { label: "XXL", value: "12rem" },
+];
+
+const DEFAULT_BANNER_TITLES: Record<string, string> = {
+  shipping: "SHIPPING INFO",
+  returns: "RETURNS",
+  "size-guide": "SIZE GUIDE",
+  privacy: "PRIVACY POLICY",
+  terms: "TERMS OF SERVICE",
+};
+
 const inputClass =
   "w-full bg-[#0a0a0a] border-2 border-infld-grey-mid text-infld-white px-3 py-2 text-sm focus:border-infld-yellow focus:outline-none transition-colors";
 const labelStyle = { fontFamily: "var(--font-typewriter)" };
@@ -64,13 +81,14 @@ export default function ContentSlugPage() {
   const pageTitle = WYSIWYG_PAGES[slug] ?? BLOCK_PAGES[slug] ?? slug.toUpperCase();
 
   const [html, setHtml] = useState("");
+  const [bannerTitle, setBannerTitle] = useState("");
+  const [bannerFontSize, setBannerFontSize] = useState("7rem");
   const [blocks, setBlocks] = useState<{ id: string; pageKey: string; blockKey: string; content: string }[]>([]);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
 
-  // Map slug to pageKey used in DB
   const pageKeyMap: Record<string, string> = {
     homepage: "home",
     about: "about",
@@ -86,6 +104,10 @@ export default function ContentSlugPage() {
         if (isWysiwyg) {
           const body = data.find((b) => b.blockKey === "body");
           setHtml(body?.content ?? "");
+          const titleBlock = data.find((b) => b.blockKey === "banner_title");
+          setBannerTitle(titleBlock?.content ?? DEFAULT_BANNER_TITLES[slug] ?? "");
+          const sizeBlock = data.find((b) => b.blockKey === "banner_title_size");
+          setBannerFontSize(sizeBlock?.content ?? "7rem");
         } else {
           setBlocks(data);
           const initial: Record<string, string> = {};
@@ -95,6 +117,25 @@ export default function ContentSlugPage() {
         setLoading(false);
       });
   }, [slug, pageKey, isWysiwyg]);
+
+  const saveBannerSettings = async () => {
+    setSaving("banner");
+    await Promise.all([
+      fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageKey, blockKey: "banner_title", content: bannerTitle }),
+      }),
+      fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageKey, blockKey: "banner_title_size", content: bannerFontSize }),
+      }),
+    ]);
+    setSaving(null);
+    setSaved("banner");
+    setTimeout(() => setSaved(null), 2000);
+  };
 
   const saveWysiwyg = async () => {
     setSaving("body");
@@ -145,9 +186,84 @@ export default function ContentSlugPage() {
           : "Edit text blocks for this page. Changes take effect on the next page load."}
       </p>
 
+      {/* Banner settings — WYSIWYG pages only */}
+      {isWysiwyg && (
+        <div className="border-2 border-infld-grey-mid p-4 bg-[#0d0d0d] mb-6">
+          <p className="text-[10px] tracking-[0.3em] text-infld-grey-light mb-4 uppercase" style={labelStyle}>
+            Banner
+          </p>
+
+          {/* Title + font size in one row */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end mb-4">
+            <div className="flex-1">
+              <label className="block text-[10px] tracking-[0.2em] text-infld-grey-light mb-2 uppercase" style={labelStyle}>
+                Title Text
+              </label>
+              <input
+                type="text"
+                value={bannerTitle}
+                onChange={(e) => setBannerTitle(e.target.value)}
+                placeholder={DEFAULT_BANNER_TITLES[slug] ?? "Banner title..."}
+                className={inputClass}
+                style={labelStyle}
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] tracking-[0.2em] text-infld-grey-light mb-2 uppercase" style={labelStyle}>
+                Font Size
+              </label>
+              <div className="flex gap-1">
+                {FONT_SIZES.map(({ label, value }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setBannerFontSize(value)}
+                    className={`px-2.5 py-1.5 text-[10px] tracking-[0.1em] border-2 transition-all duration-75 ${
+                      bannerFontSize === value
+                        ? "bg-infld-yellow text-infld-black border-infld-yellow"
+                        : "bg-transparent text-infld-grey-light border-infld-grey-mid hover:border-infld-white hover:text-infld-white"
+                    }`}
+                    style={labelStyle}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="bg-infld-black/40 px-4 py-2 mb-4 overflow-hidden">
+            <span
+              className="text-infld-white stencil-text block truncate"
+              style={{ fontFamily: "var(--font-display)", fontSize: bannerFontSize, lineHeight: 1 }}
+            >
+              {bannerTitle || DEFAULT_BANNER_TITLES[slug] || "PREVIEW"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={saveBannerSettings}
+              disabled={saving === "banner"}
+              className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-1.5 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-50"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {saving === "banner" ? "SAVING..." : "SAVE BANNER"}
+            </button>
+            {saved === "banner" && (
+              <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>✓ SAVED</span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* WYSIWYG editor */}
       {isWysiwyg && (
         <div>
+          <p className="text-[10px] tracking-[0.3em] text-infld-grey-light mb-3 uppercase" style={labelStyle}>
+            Page Content
+          </p>
           <RichTextEditor value={html} onChange={setHtml} />
           <div className="flex items-center gap-3 mt-4">
             <button
@@ -156,7 +272,7 @@ export default function ContentSlugPage() {
               className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-6 py-2 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-50"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              {saving === "body" ? "SAVING..." : "SAVE"}
+              {saving === "body" ? "SAVING..." : "SAVE CONTENT"}
             </button>
             {saved === "body" && (
               <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>

@@ -12,8 +12,18 @@ interface ContactMessage {
   createdAt: string;
 }
 
+const FONT_SIZES = [
+  { label: "XS", value: "2rem" },
+  { label: "SM", value: "3rem" },
+  { label: "MD", value: "5rem" },
+  { label: "LG", value: "7rem" },
+  { label: "XL", value: "9rem" },
+  { label: "XXL", value: "12rem" },
+];
+
 interface Settings {
   heading: string;
+  heading_size: string;
   subheading: string;
   notify_email: string;
 }
@@ -23,7 +33,7 @@ const inputClass =
 const labelStyle = { fontFamily: "var(--font-typewriter)" };
 
 export default function AdminContactPage() {
-  const [settings, setSettings] = useState<Settings>({ heading: "", subheading: "", notify_email: "" });
+  const [settings, setSettings] = useState<Settings>({ heading: "", heading_size: "7rem", subheading: "", notify_email: "" });
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(true);
@@ -35,9 +45,10 @@ export default function AdminContactPage() {
     fetch("/api/admin/content?pageKey=contact")
       .then((r) => r.json())
       .then((data: { blockKey: string; content: string }[]) => {
-        const s: Settings = { heading: "", subheading: "", notify_email: "" };
+        const s: Settings = { heading: "", heading_size: "7rem", subheading: "", notify_email: "" };
         data.forEach((b) => {
           if (b.blockKey === "heading") s.heading = b.content;
+          else if (b.blockKey === "heading_size") s.heading_size = b.content || "7rem";
           else if (b.blockKey === "subheading") s.subheading = b.content;
           else if (b.blockKey === "notify_email") s.notify_email = b.content;
         });
@@ -94,9 +105,61 @@ export default function AdminContactPage() {
           <p className="text-infld-grey-mid text-xs" style={labelStyle}>Loading...</p>
         ) : (
           <div className="space-y-4">
+            {/* Heading with font size selector */}
+            <div className="border-2 border-infld-grey-mid p-4 bg-[#0d0d0d]">
+              <label className="block text-[10px] tracking-[0.25em] text-infld-grey-light mb-3 uppercase" style={labelStyle}>
+                Banner Heading
+              </label>
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end mb-3">
+                <input
+                  type="text"
+                  value={settings.heading}
+                  placeholder="GET IN TOUCH"
+                  onChange={(e) => setSettings((s) => ({ ...s, heading: e.target.value }))}
+                  className={`${inputClass} flex-1`}
+                  style={labelStyle}
+                />
+                <div>
+                  <label className="block text-[10px] tracking-[0.2em] text-infld-grey-light mb-2 uppercase" style={labelStyle}>
+                    Font Size
+                  </label>
+                  <div className="flex gap-1">
+                    {FONT_SIZES.map(({ label, value }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setSettings((s) => ({ ...s, heading_size: value }))}
+                        className={`px-2.5 py-1.5 text-[10px] tracking-[0.1em] border-2 transition-all duration-75 ${
+                          settings.heading_size === value
+                            ? "bg-infld-yellow text-infld-black border-infld-yellow"
+                            : "bg-transparent text-infld-grey-light border-infld-grey-mid hover:border-infld-white hover:text-infld-white"
+                        }`}
+                        style={labelStyle}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => { saveSetting("heading"); saveSetting("heading_size"); }}
+                  disabled={saving === "heading"}
+                  className="bg-infld-yellow text-infld-black text-[10px] tracking-[0.15em] px-4 py-1.5 border-2 border-infld-black hover:shadow-[2px_2px_0_#FFE600] transition-all duration-75 disabled:opacity-50"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {saving === "heading" ? "SAVING..." : "SAVE"}
+                </button>
+                {saved === "heading" && (
+                  <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>✓ SAVED</span>
+                )}
+              </div>
+            </div>
+
+            {/* Remaining settings */}
             {(
               [
-                { key: "heading" as const, label: "Page Heading", placeholder: "GET IN TOUCH" },
                 { key: "subheading" as const, label: "Subheading", placeholder: "Questions? Collabs? Noise? We're here." },
                 { key: "notify_email" as const, label: "Notification Email (optional)", placeholder: "hello@infld.com" },
               ] as { key: keyof Settings; label: string; placeholder: string }[]

@@ -1,9 +1,10 @@
 interface Props {
   title?: string;
   bannerUrl?: string | null;
+  fontSize?: string;
 }
 
-export function PageBanner({ title, bannerUrl }: Props) {
+export function PageBanner({ title, bannerUrl, fontSize }: Props) {
   return (
     <section
       className="relative overflow-hidden flex items-center px-4"
@@ -20,7 +21,11 @@ export function PageBanner({ title, bannerUrl }: Props) {
         <div className="max-w-4xl mx-auto relative z-10">
           <h1
             className="text-infld-white stencil-text"
-            style={{ fontFamily: "var(--font-display)", fontSize: "clamp(3rem, 12vw, 7rem)", lineHeight: 0.95 }}
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: fontSize ?? "clamp(3rem, 12vw, 7rem)",
+              lineHeight: 0.95,
+            }}
           >
             {title}
           </h1>
