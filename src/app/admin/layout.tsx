@@ -44,7 +44,7 @@ export default function AdminLayout({
       <aside className="w-60 bg-[#111] border-r-2 border-infld-grey-mid flex flex-col shrink-0 min-h-screen">
         <div className="p-5 border-b-2 border-infld-grey-mid">
           <Link href="/admin" className="block" style={{ fontFamily: "var(--font-display)" }}>
-            <span className="text-infld-yellow text-3xl tracking-wider">INFLD</span>
+            <span className="admin-wordmark text-infld-yellow text-3xl tracking-wider">INFLD</span>
           </Link>
           <p className="text-infld-grey-light text-[10px] tracking-[0.3em] mt-1"
              style={{ fontFamily: "var(--font-typewriter)" }}>

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 
-/* Pages that use WYSIWYG (single HTML body) */
 const WYSIWYG_PAGES: Record<string, string> = {
   shipping: "SHIPPING INFO",
   returns: "RETURNS",
@@ -13,7 +12,6 @@ const WYSIWYG_PAGES: Record<string, string> = {
   terms: "TERMS OF SERVICE",
 };
 
-/* Pages that use block-based text fields */
 const BLOCK_PAGES: Record<string, string> = {
   homepage: "HOMEPAGE",
   about: "ABOUT",
@@ -51,13 +49,18 @@ const BLOCK_LABELS: Record<string, string> = {
   bottom_text: "Bottom Text",
 };
 
-const FONT_SIZES = [
+const BANNER_FONT_SIZES = [
   { label: "XS", value: "2rem" },
   { label: "SM", value: "3rem" },
   { label: "MD", value: "5rem" },
   { label: "LG", value: "7rem" },
   { label: "XL", value: "9rem" },
   { label: "XXL", value: "12rem" },
+];
+
+const BLOCK_FONT_SIZES_PX = [
+  10, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 40,
+  48, 56, 64, 72, 80, 96, 112, 128, 144, 160,
 ];
 
 const DEFAULT_BANNER_TITLES: Record<string, string> = {
@@ -70,6 +73,8 @@ const DEFAULT_BANNER_TITLES: Record<string, string> = {
 
 const inputClass =
   "w-full bg-[#0a0a0a] border-2 border-infld-grey-mid text-infld-white px-3 py-2 text-sm focus:border-infld-yellow focus:outline-none transition-colors";
+const selectClass =
+  "bg-[#0a0a0a] border-2 border-infld-grey-mid text-infld-white px-2 py-2 text-xs focus:border-infld-yellow focus:outline-none transition-colors shrink-0 w-[90px]";
 const labelStyle = { fontFamily: "var(--font-typewriter)" };
 
 export default function ContentSlugPage() {
@@ -77,7 +82,6 @@ export default function ContentSlugPage() {
 
   const isWysiwyg = slug in WYSIWYG_PAGES;
   const isBlock = slug in BLOCK_PAGES;
-
   const pageTitle = WYSIWYG_PAGES[slug] ?? BLOCK_PAGES[slug] ?? slug.toUpperCase();
 
   const [html, setHtml] = useState("");
@@ -85,6 +89,7 @@ export default function ContentSlugPage() {
   const [bannerFontSize, setBannerFontSize] = useState("7rem");
   const [blocks, setBlocks] = useState<{ id: string; pageKey: string; blockKey: string; content: string }[]>([]);
   const [edits, setEdits] = useState<Record<string, string>>({});
+  const [sizes, setSizes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
@@ -104,15 +109,21 @@ export default function ContentSlugPage() {
         if (isWysiwyg) {
           const body = data.find((b) => b.blockKey === "body");
           setHtml(body?.content ?? "");
-          const titleBlock = data.find((b) => b.blockKey === "banner_title");
-          setBannerTitle(titleBlock?.content ?? DEFAULT_BANNER_TITLES[slug] ?? "");
-          const sizeBlock = data.find((b) => b.blockKey === "banner_title_size");
-          setBannerFontSize(sizeBlock?.content ?? "7rem");
+          setBannerTitle(data.find((b) => b.blockKey === "banner_title")?.content ?? DEFAULT_BANNER_TITLES[slug] ?? "");
+          setBannerFontSize(data.find((b) => b.blockKey === "banner_title_size")?.content ?? "7rem");
         } else {
-          setBlocks(data);
+          // Separate size blocks from content blocks
+          const sizeBlocks = data.filter((b) => b.blockKey.endsWith("_size"));
+          const contentBlocks = data.filter((b) => !b.blockKey.endsWith("_size"));
+          setBlocks(contentBlocks);
+
           const initial: Record<string, string> = {};
-          data.forEach((b) => { initial[`${b.pageKey}:${b.blockKey}`] = b.content; });
+          contentBlocks.forEach((b) => { initial[`${b.pageKey}:${b.blockKey}`] = b.content; });
           setEdits(initial);
+
+          const initialSizes: Record<string, string> = {};
+          sizeBlocks.forEach((b) => { initialSizes[`${b.pageKey}:${b.blockKey}`] = b.content; });
+          setSizes(initialSizes);
         }
         setLoading(false);
       });
@@ -151,39 +162,40 @@ export default function ContentSlugPage() {
 
   const saveBlock = async (blockKey: string) => {
     const key = `${pageKey}:${blockKey}`;
+    const sizeKey = `${pageKey}:${blockKey}_size`;
     setSaving(key);
-    await fetch("/api/admin/content", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pageKey, blockKey, content: edits[key] ?? "" }),
-    });
+    await Promise.all([
+      fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageKey, blockKey, content: edits[key] ?? "" }),
+      }),
+      fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageKey, blockKey: `${blockKey}_size`, content: sizes[sizeKey] ?? "" }),
+      }),
+    ]);
     setSaving(null);
     setSaved(key);
     setTimeout(() => setSaved(null), 2000);
   };
 
   if (!isWysiwyg && !isBlock) {
-    return (
-      <p className="text-infld-grey-mid text-sm" style={labelStyle}>
-        Unknown page: {slug}
-      </p>
-    );
+    return <p className="text-infld-grey-mid text-sm" style={labelStyle}>Unknown page: {slug}</p>;
   }
 
-  if (loading) return (
-    <p className="text-infld-grey-mid text-sm" style={labelStyle}>Loading...</p>
-  );
+  if (loading) return <p className="text-infld-grey-mid text-sm" style={labelStyle}>Loading...</p>;
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl tracking-wider text-infld-white mb-2"
-          style={{ fontFamily: "var(--font-display)" }}>
+      <h1 className="text-3xl tracking-wider text-infld-white mb-2" style={{ fontFamily: "var(--font-display)" }}>
         {pageTitle}
       </h1>
       <p className="text-infld-grey-mid text-xs mb-8" style={labelStyle}>
         {isWysiwyg
           ? "Write page content using the editor below. Changes appear on the public page immediately after saving."
-          : "Edit text blocks for this page. Changes take effect on the next page load."}
+          : "Edit text blocks for this page. Use the px dropdown to set font size. Changes take effect on the next page load."}
       </p>
 
       {/* Banner settings — WYSIWYG pages only */}
@@ -192,8 +204,6 @@ export default function ContentSlugPage() {
           <p className="text-[10px] tracking-[0.3em] text-infld-grey-light mb-4 uppercase" style={labelStyle}>
             Banner
           </p>
-
-          {/* Title + font size in one row */}
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end mb-4">
             <div className="flex-1">
               <label className="block text-[10px] tracking-[0.2em] text-infld-grey-light mb-2 uppercase" style={labelStyle}>
@@ -213,7 +223,7 @@ export default function ContentSlugPage() {
                 Font Size
               </label>
               <div className="flex gap-1">
-                {FONT_SIZES.map(({ label, value }) => (
+                {BANNER_FONT_SIZES.map(({ label, value }) => (
                   <button
                     key={value}
                     type="button"
@@ -231,8 +241,6 @@ export default function ContentSlugPage() {
               </div>
             </div>
           </div>
-
-          {/* Preview */}
           <div className="bg-infld-black/40 px-4 py-2 mb-4 overflow-hidden">
             <span
               className="text-infld-white stencil-text block truncate"
@@ -241,7 +249,6 @@ export default function ContentSlugPage() {
               {bannerTitle || DEFAULT_BANNER_TITLES[slug] || "PREVIEW"}
             </span>
           </div>
-
           <div className="flex items-center gap-3">
             <button
               onClick={saveBannerSettings}
@@ -275,9 +282,7 @@ export default function ContentSlugPage() {
               {saving === "body" ? "SAVING..." : "SAVE CONTENT"}
             </button>
             {saved === "body" && (
-              <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>
-                ✓ SAVED
-              </span>
+              <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>✓ SAVED</span>
             )}
           </div>
         </div>
@@ -287,38 +292,50 @@ export default function ContentSlugPage() {
       {isBlock && (
         <div className="space-y-4">
           {blocks.length === 0 && (
-            <p className="text-infld-grey-mid text-sm" style={labelStyle}>
-              No content blocks for this page yet.
-            </p>
+            <p className="text-infld-grey-mid text-sm" style={labelStyle}>No content blocks for this page yet.</p>
           )}
           {blocks.map((block) => {
             const key = `${block.pageKey}:${block.blockKey}`;
+            const sizeKey = `${block.pageKey}:${block.blockKey}_size`;
             const value = edits[key] ?? "";
             const isMultiline = value.includes("\n") || value.length > 100 || block.blockKey === "manifesto";
             const label = BLOCK_LABELS[block.blockKey] || block.blockKey.replace(/_/g, " ");
 
             return (
               <div key={block.id} className="border-2 border-infld-grey-mid p-4 bg-[#0d0d0d]">
-                <label className="block text-[10px] tracking-[0.25em] text-infld-grey-light mb-3 uppercase"
-                       style={labelStyle}>
+                <label className="block text-[10px] tracking-[0.25em] text-infld-grey-light mb-3 uppercase" style={labelStyle}>
                   {label}
                 </label>
-                {isMultiline ? (
-                  <textarea
-                    value={value}
-                    onChange={(e) => setEdits((p) => ({ ...p, [key]: e.target.value }))}
-                    className={`${inputClass} min-h-[100px]`}
+                <div className="flex gap-2 items-start">
+                  {isMultiline ? (
+                    <textarea
+                      value={value}
+                      onChange={(e) => setEdits((p) => ({ ...p, [key]: e.target.value }))}
+                      className={`${inputClass} min-h-[100px] flex-1`}
+                      style={labelStyle}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) => setEdits((p) => ({ ...p, [key]: e.target.value }))}
+                      className={`${inputClass} flex-1`}
+                      style={labelStyle}
+                    />
+                  )}
+                  <select
+                    value={sizes[sizeKey] ?? ""}
+                    onChange={(e) => setSizes((p) => ({ ...p, [sizeKey]: e.target.value }))}
+                    className={selectClass}
                     style={labelStyle}
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={value}
-                    onChange={(e) => setEdits((p) => ({ ...p, [key]: e.target.value }))}
-                    className={inputClass}
-                    style={labelStyle}
-                  />
-                )}
+                    title="Font size"
+                  >
+                    <option value="">— px —</option>
+                    {BLOCK_FONT_SIZES_PX.map((px) => (
+                      <option key={px} value={`${px}px`}>{px}px</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="flex items-center gap-3 mt-3">
                   <button
                     onClick={() => saveBlock(block.blockKey)}
@@ -329,9 +346,7 @@ export default function ContentSlugPage() {
                     {saving === key ? "SAVING..." : "SAVE"}
                   </button>
                   {saved === key && (
-                    <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>
-                      ✓ SAVED
-                    </span>
+                    <span className="text-green-400 text-[10px] tracking-wider" style={labelStyle}>✓ SAVED</span>
                   )}
                 </div>
               </div>

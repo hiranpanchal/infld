@@ -348,9 +348,29 @@ html[data-theme="light"] aside nav a[class*="border-l-infld-yellow"] {
 html[data-theme="light"] input[class~="bg-[#111]"],
 html[data-theme="light"] input[class~="bg-[#0a0a0a]"],
 html[data-theme="light"] textarea[class~="bg-[#0a0a0a]"],
-html[data-theme="light"] select[class~="bg-[#111]"] {
+html[data-theme="light"] select[class~="bg-[#111]"],
+html[data-theme="light"] select[class~="bg-[#0a0a0a]"] {
   background-color: #FAFAF8 !important;
   color: #0A0A0A !important;
+}
+
+/* Admin sidebar: yellow logo + active labels → black in light mode */
+html[data-theme="light"] aside [class~="text-infld-yellow"] {
+  color: #1A1A1A !important;
+}
+
+/* Active sidebar item accent line → dark in light mode */
+html[data-theme="light"] aside [class~="border-l-infld-yellow"] {
+  border-left-color: #1A1A1A !important;
+}
+
+/* Sidebar nav item text in light mode */
+html[data-theme="light"] aside nav [class~="text-infld-grey-light"] {
+  color: #4A4540 !important;
+}
+
+html[data-theme="light"] aside [class~="border-infld-grey-mid"] {
+  border-color: #C8C4BE !important;
 }
 
 /* ============================================
